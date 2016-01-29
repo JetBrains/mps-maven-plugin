@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mps-maven-sample</artifactId>
+    <name>MPS Maven Plugin Sample</name>
+    <properties>
+        <mps-maven-plugin.version>${project.version}</mps-maven-plugin.version>
+    </properties>
+
+    <parent>
+        <groupId>org.jetbrains.mps</groupId>
+        <artifactId>mps-maven-plugin-parent</artifactId>
+        <relativePath>../</relativePath>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.mps</groupId>
+                <artifactId>mps-maven-plugin</artifactId>
+                <version>${mps-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-java</goal>
+                        </goals>
+                        <configuration>
+                            <mpsVersion>${mps.version}</mpsVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

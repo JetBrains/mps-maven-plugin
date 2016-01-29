@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.jetbrains.mps</groupId>
+    <artifactId>mps-maven-plugin-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>MPS Maven Plugin - Parent</name>
+    <packaging>pom</packaging>
+    <url>https://github.com/JetBrains/mps-maven-plugin</url>
+    <scm>
+        <url>https://github.com/JetBrains/mps-maven-plugin</url>
+        <connection>scm:git:git@github.com:JetBrains/mps-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:JetBrains/mps-maven-plugin.git</developerConnection>
+    </scm>
+
+    <modules>
+        <module>mps-maven-plugin</module>
+        <module>mps-maven-sample</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <mps.version>143.958</mps.version>
+        <maven.version>3.1.1</maven.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.4</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
