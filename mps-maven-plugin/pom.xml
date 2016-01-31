@@ -172,16 +172,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.12</version>
-                <configuration>
-                    <message>Update plugin site</message>
-                    <merge>true</merge>
-                    <server>github</server>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
