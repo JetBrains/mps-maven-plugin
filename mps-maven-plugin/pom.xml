@@ -113,6 +113,16 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
+            <artifactId>mps-logging</artifactId>
+            <version>${mps.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.mps</groupId>
+            <artifactId>mps-messaging</artifactId>
+            <version>${mps.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-platform</artifactId>
             <version>${mps.version}</version>
         </dependency>

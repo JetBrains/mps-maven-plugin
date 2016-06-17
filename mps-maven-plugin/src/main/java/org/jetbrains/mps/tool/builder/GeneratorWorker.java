@@ -626,10 +626,6 @@ public class GeneratorWorker {
                 default:
             }
         }
-
-        @Override
-        public void clear() {
-        }
     }
 
     protected class ObjectsToProcess {
