@@ -103,7 +103,7 @@ public class GenerateJavaMojo extends AbstractMojo {
         Script script = new Script();
         script.setLoadBootstrapLibraries(false);
 
-        for (File file : listModelFiles()) {
+        for (File file : ModelFiles.listModelFiles(modelsDirectory)) {
             script.addModelFile(file);
         }
 
@@ -120,7 +120,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                 public void run() {
                     try {
                         List<SModelBase> models = Lists.newArrayList();
-                        for (File file : listModelFiles()) {
+                        for (File file : ModelFiles.listModelFiles(modelsDirectory)) {
                             models.add((SModelBase) loadModel(file));
                         }
 
@@ -280,11 +280,6 @@ public class GenerateJavaMojo extends AbstractMojo {
             }
         }
         return descriptor;
-    }
-
-    @NotNull
-    private Collection<File> listModelFiles() {
-        return FileUtils.listFiles(modelsDirectory, null, true);
     }
 
     private static Artifact[] getDefaultDependencies(String mpsVersion) {
