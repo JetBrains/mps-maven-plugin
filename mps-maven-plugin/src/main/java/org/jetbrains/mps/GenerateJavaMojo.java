@@ -1,28 +1,29 @@
 package org.jetbrains.mps;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
+import com.google.common.io.Closer;
 import com.google.common.io.Files;
 import com.pyx4j.log4j.MavenLogAppender;
-import jetbrains.mps.extapi.model.SModelBase;
-import jetbrains.mps.extapi.module.SModuleBase;
-import jetbrains.mps.extapi.persistence.FileDataSource;
-import jetbrains.mps.library.ModulesMiner;
+import jetbrains.mps.extapi.persistence.FileBasedModelRoot;
+import jetbrains.mps.persistence.DefaultModelRoot;
 import jetbrains.mps.project.ModuleId;
-import jetbrains.mps.project.structure.modules.ModuleReference;
+import jetbrains.mps.project.persistence.SolutionDescriptorPersistence;
+import jetbrains.mps.project.structure.model.ModelRootDescriptor;
 import jetbrains.mps.project.structure.modules.SolutionDescriptor;
-import jetbrains.mps.smodel.ModuleRepositoryFacade;
-import jetbrains.mps.smodel.adapter.structure.language.SLanguageAdapterById;
+import jetbrains.mps.tool.builder.MpsWorker;
+import jetbrains.mps.tool.builder.make.GeneratorWorker;
+import jetbrains.mps.tool.common.JavaCompilerProperties;
+import jetbrains.mps.tool.common.Script;
+import jetbrains.mps.util.MacroHelper;
 import jetbrains.mps.vfs.FileSystem;
-import jetbrains.mps.vfs.FileSystemProvider;
-import jetbrains.mps.vfs.IFile;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Level;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -37,11 +38,7 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.mps.openapi.language.SLanguage;
-import org.jetbrains.mps.openapi.module.SModule;
-import org.jetbrains.mps.openapi.persistence.PersistenceFacade;
-import org.jetbrains.mps.tool.builder.GeneratorWorker;
-import org.jetbrains.mps.tool.builder.Script;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -57,10 +53,9 @@ import java.util.zip.ZipFile;
 /**
  * Generate Java files from MPS models written in BaseLanguage.
  */
-@Mojo(name = "generate-java", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresProject = true)
+@Mojo(name = "generate-java", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateJavaMojo extends AbstractMojo {
-    public static final String ARTIFACT_TYPE_LANGUAGE_ARCHIVE = "lar";
-    private final FileSystemProvider fileSystemProvider = FileSystem.getInstance().getFileSystemProvider();
+    private static final String ARTIFACT_TYPE_LANGUAGE_ARCHIVE = "lar";
 
     /**
      * Input directory containing MPS models
@@ -99,60 +94,96 @@ public class GenerateJavaMojo extends AbstractMojo {
     private File languagesTempDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        MavenLogAppender.startPluginLog(this);
-        Script script = new Script();
-        script.setLoadBootstrapLibraries(false);
+        try (Closer closer = Closer.create()) {
+            MavenLogAppender.startPluginLog(this);
+            closer.register(() -> MavenLogAppender.endPluginLog(this));
 
-        for (File file : ModelFiles.listModelFiles(modelsDirectory)) {
-            script.addModelFile(file);
-        }
-
-        try {
             languagesTempDirectory = Files.createTempDir();
+            closer.register(() -> tryDeletingDirectory(languagesTempDirectory));
+
+            Script script = new Script();
+            script.updateLogLevel(Level.TRACE);
+
+            // Disable loading bootstrap libraries, otherwise MPS looks for them in some lib folder under some home path
+            // and the plugin doesn't provide anything like that, so it fails.
+            script.setLoadBootstrapLibraries(false);
+
+            // Leave compilation to Maven. We can do it since we generate one module at a time, and it lets us (and the
+            // plugin user) control the compilation process.
+            new JavaCompilerProperties(script).setSkipCompilation(true);
+
             addLibraryJarsToScript(script, resolveDependencies());
 
-            GeneratorWorker worker = new GeneratorWorker(script, getLog());
-            worker.setupEnvironment();
+            File file = writeTemporarySolution();
+            script.addChunk(Lists.newArrayList(file.getAbsolutePath()), false);
 
-            final MavenMpsProject project = new MavenMpsProject(mavenProject.getName());
-            project.getRepository().getModelAccess().runWriteAction(new Runnable() {
+            new GeneratorWorker(script, new MpsWorker.AntLogger() {
+                final Log log = getLog();
+
                 @Override
-                public void run() {
-                    try {
-                        List<SModelBase> models = Lists.newArrayList();
-                        for (File file : ModelFiles.listModelFiles(modelsDirectory)) {
-                            models.add((SModelBase) loadModel(file));
-                        }
-
-                        createModule(models);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                public void log(String text, Level level) {
+                    if (Level.DEBUG.isGreaterOrEqual(level)) {
+                        log.debug(text);
+                    } else if (level == Level.INFO) {
+                        log.info(text);
+                    } else if (level == Level.WARN) {
+                        log.warn(text);
+                    } else {
+                        log.error(text);
                     }
                 }
-
-                private void createModule(List<SModelBase> models) {
-                    SModule module = ModuleRepositoryFacade.createModule(new ModulesMiner.ModuleHandle(fileSystemProvider.getFile(mavenProject.getFile().getAbsolutePath()),
-                            createSolutionDescriptor(models)), project);
-                    for (SModelBase model : models) {
-                        ((SModuleBase) module).registerModel(model);
-                    }
-                }
-            });
-
-            worker.workFromBaseGenerator();
+            }).work();
 
             mavenProject.addCompileSourceRoot(outputDirectory.getPath());
         } catch (IOException e) {
             throw new MojoExecutionException("Error in mps-maven-plugin", e);
-        } finally {
-            try {
-                getLog().debug("Deleting directory " + languagesTempDirectory);
-                FileUtils.deleteDirectory(languagesTempDirectory);
-            } catch (IOException io) {
-                getLog().error("Could not delete temporary directory " + languagesTempDirectory, io);
-            }
-            MavenLogAppender.endPluginLog(this);
         }
+    }
+
+    private void tryDeletingDirectory(File directory) {
+        try {
+            getLog().debug("Deleting directory " + directory);
+            FileUtils.deleteDirectory(directory);
+        } catch (IOException io) {
+            getLog().error("Could not delete directory " + directory, io);
+        }
+    }
+
+    private File writeTemporarySolution() {
+        File file = new File(languagesTempDirectory, "solution.msd");
+        SolutionDescriptor descriptor = new SolutionDescriptor();
+        descriptor.getModelRootDescriptors().add(newModelRootDescriptor(modelsDirectory));
+        descriptor.setOutputPath(outputDirectory.getAbsolutePath());
+        descriptor.setNamespace(mavenProject.getGroupId() + "." + mavenProject.getArtifactId());
+        descriptor.setId(ModuleId.foreign(mavenProject.getGroupId() + "." + mavenProject.getArtifactId()));
+        descriptor.setCompileInMPS(false);
+
+        SolutionDescriptorPersistence.saveSolutionDescriptor(FileSystem.getInstance().getFileByPath(file.getAbsolutePath()),
+                descriptor, new MacroHelper() {
+                    @Override
+                    public String expandPath(@Nullable String path) {
+                        return path;
+                    }
+
+                    @Override
+                    public String shrinkPath(@Nullable String absolutePath) {
+                        return absolutePath;
+                    }
+                });
+
+        file.deleteOnExit();
+        return file;
+    }
+
+    @NotNull
+    private static ModelRootDescriptor newModelRootDescriptor(File modelsDirectory) {
+        DefaultModelRoot modelRoot = new DefaultModelRoot();
+        modelRoot.setContentRoot(modelsDirectory.getAbsolutePath());
+        modelRoot.addFile(FileBasedModelRoot.SOURCE_ROOTS, modelsDirectory.getAbsolutePath());
+
+        ModelRootDescriptor result = new ModelRootDescriptor();
+        modelRoot.save(result.getMemento());
+        return result;
     }
 
     private void addLibraryJarsToScript(Script script, List<ArtifactResult> artifactResults) throws IOException {
@@ -165,8 +196,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                     getLog().debug("Extracting " + artifact + " to " + tempDirectory);
                 }
                 List<File> extractedFiles = Lists.newArrayList();
-                ZipFile zipFile = new ZipFile(artifact.getFile(), ZipFile.OPEN_READ);
-                try {
+                try (ZipFile zipFile = new ZipFile(artifact.getFile(), ZipFile.OPEN_READ)) {
                     Enumeration<? extends ZipEntry> entries = zipFile.entries();
                     while (entries.hasMoreElements()) {
                         ZipEntry entry = entries.nextElement();
@@ -176,8 +206,6 @@ public class GenerateJavaMojo extends AbstractMojo {
                         getLog().debug("Extracting " + entry.getName());
                         extractedFiles.add(extract(zipFile, entry, tempDirectory));
                     }
-                } finally {
-                    zipFile.close();
                 }
 
                 getLog().debug("Extracted " + extractedFiles.size() + " files successfully");
@@ -194,22 +222,13 @@ public class GenerateJavaMojo extends AbstractMojo {
     /**
      * @return extracted file
      */
-    private File extract(ZipFile zipFile, ZipEntry entry, File destDirectory) throws IOException {
-        InputStream input = null;
-        FileOutputStream output = null;
-        boolean threw = true;
-        try {
-            input = zipFile.getInputStream(entry);
-            File destFile = new File(destDirectory, entry.getName());
-            output = FileUtils.openOutputStream(destFile);
+    private File extract(ZipFile zipFile, ZipEntry entry, File destinationDirectory) throws IOException {
+        File destFile = new File(destinationDirectory, entry.getName());
 
+        try (InputStream input = zipFile.getInputStream(entry);
+             FileOutputStream output = FileUtils.openOutputStream(destFile)) {
             IOUtils.copy(input, output);
-
-            threw = false;
             return destFile;
-        } finally {
-            Closeables.closeQuietly(input);
-            Closeables.close(output, threw);
         }
     }
 
@@ -248,42 +267,8 @@ public class GenerateJavaMojo extends AbstractMojo {
         return new DefaultArtifact(dep.getGroupId(), dep.getArtifactId(), dep.getClassifier(), dep.getType(), dep.getVersion());
     }
 
-    private org.jetbrains.mps.openapi.model.SModel loadModel(File file) throws IOException {
-        final IFile ifile = FileSystem.getInstance().getFileByPath(file.getAbsolutePath());
-        return PersistenceFacade.getInstance()
-                .getModelFactory(FilenameUtils.getExtension(ifile.getName()))
-                .load(new FileDataSource(ifile), new HashMap<String, String>());
-    }
-
-    /**
-     * Creates a synthetic solution descriptor for a collection of models since MPS generator works on solutions, not
-     * bare models.
-     * @param models the models to include in the solution.
-     * @return a synthetic solution descriptor with a randomly generated ID and namespace set to 'internal'.
-     */
-    @NotNull
-    private SolutionDescriptor createSolutionDescriptor(List<SModelBase> models) {
-        SolutionDescriptor descriptor = new SolutionDescriptor();
-        descriptor.setId(ModuleId.regular());
-        descriptor.setNamespace("internal");
-
-        descriptor.setOutputPath(outputDirectory.getPath());
-
-        for (SModelBase model : models) {
-            Collection<SLanguage> usedLanguages = model.getSModel().usedLanguages();
-
-            for (SLanguage lang : usedLanguages) {
-                SLanguageAdapterById langById = (SLanguageAdapterById) lang;
-
-                descriptor.getUsedLanguages().add(
-                        new ModuleReference(lang.getQualifiedName(), ModuleId.regular(langById.getId().getIdValue())));
-            }
-        }
-        return descriptor;
-    }
-
     private static Artifact[] getDefaultDependencies(String mpsVersion) {
-        return new Artifact[] {
+        return new Artifact[]{
                 new DefaultArtifact("org.jetbrains.mps.languages", "languageDesign", "lar", mpsVersion),
                 new DefaultArtifact("org.jetbrains.mps.languages", "baseLanguage", "lar", mpsVersion),
                 new DefaultArtifact("org.jetbrains.mps.languages", "make", "lar", mpsVersion),
