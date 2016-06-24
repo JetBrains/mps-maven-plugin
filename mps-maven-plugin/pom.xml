@@ -48,16 +48,6 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
-            <artifactId>platform</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>util</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-openapi</artifactId>
             <version>${mps.version}</version>
         </dependency>
@@ -70,16 +60,19 @@
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-closures</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-collections</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-tuples</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
@@ -95,63 +88,55 @@
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-behavior-api</artifactId>
             <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-editor</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-editor-api</artifactId>
-            <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-behavior-runtime</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-logging</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-messaging</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-platform</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>asm-all</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>jdom</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
             <artifactId>trove4j</artifactId>
             <version>${mps.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
