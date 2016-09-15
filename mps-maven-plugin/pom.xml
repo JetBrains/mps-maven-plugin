@@ -34,105 +34,17 @@
             <artifactId>plexus-compiler-api</artifactId>
             <version>2.6</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>${maven.version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-openapi</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-core</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-closures</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-collections</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-tuples</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-tool</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-environment</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-behavior-api</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-behavior-runtime</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-logging</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-messaging</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-platform</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>jdom</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>${mps.version}</version>
-            <scope>runtime</scope>
-        </dependency>
 
+        <dependency>
+            <groupId>org.jetbrains.mps</groupId>
+            <artifactId>mps-libs</artifactId>
+            <version>${mps.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -148,11 +60,36 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.pyx4j</groupId>
             <artifactId>maven-plugin-log4j</artifactId>
             <version>1.0.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>java-hamcrest</artifactId>
+            <version>2.0.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.0.77-beta</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

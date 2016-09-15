@@ -21,7 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <mps.version>144.SNAPSHOT</mps.version>
+        <mps.version>162.SNAPSHOT</mps.version>
         <maven.version>3.1.1</maven.version>
     </properties>
 
