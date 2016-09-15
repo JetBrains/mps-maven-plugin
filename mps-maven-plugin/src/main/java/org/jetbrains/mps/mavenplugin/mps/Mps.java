@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin.mps;
 
 import com.google.common.collect.Lists;
 import jetbrains.mps.tool.builder.make.GeneratorWorker;
@@ -9,8 +9,8 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
 
-class Mps {
-    static void runGenerator(Log log, GeneratorInput generatorInput) {
+public class Mps {
+    public static void runGenerator(Log log, GeneratorInput generatorInput) {
         Script script = toScript(generatorInput);
         new GeneratorWorker(script, new MpsToMavenLogger(log)).work();
     }

@@ -1,7 +1,8 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin;
 
 import com.google.common.io.Files;
 import org.apache.maven.plugin.logging.Log;
+import org.jetbrains.mps.mavenplugin.ZipExtractor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
@@ -22,6 +22,10 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.mps.mavenplugin.mps.GeneratorInput;
+import org.jetbrains.mps.mavenplugin.mps.Mps;
+import org.jetbrains.mps.mavenplugin.mps.MpsModule;
+import org.jetbrains.mps.mavenplugin.mps.TemporarySolution;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +53,7 @@ public class GenerateJavaMojo extends AbstractMojo {
     private MavenProject mavenProject;
 
     /**
-     * Additional used MPS languages or Java libraries.
+     * Additional used MPS languages or Java libraries that cannot be found via the mappings.
      */
     @Parameter
     private Dependency[] dependencies;

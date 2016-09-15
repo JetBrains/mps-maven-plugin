@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin.mps;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.FileUtils;
@@ -8,14 +8,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class MpsModule {
-    final List<File> libraries;
+public class MpsModule {
+    public final List<File> libraries;
 
-    private MpsModule(List<File> libraries) {
+    public MpsModule(List<File> libraries) {
         this.libraries = libraries;
     }
 
-    static MpsModule readFromFile(File root) {
+    public static MpsModule readFromFile(File root) {
         if (root.isFile()) {
             return new MpsModule(Collections.singletonList(root));
         }

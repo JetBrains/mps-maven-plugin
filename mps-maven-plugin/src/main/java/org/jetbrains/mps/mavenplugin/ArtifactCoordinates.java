@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin;
 
 import com.google.common.base.Strings;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +16,8 @@ class ArtifactCoordinates {
     @NotNull
     final String version;
 
-    ArtifactCoordinates(@Nullable String groupId, @Nullable String artifactId, @Nullable String classifier,
-                        @Nullable String extension, @Nullable String version) {
+    public ArtifactCoordinates(@Nullable String groupId, @Nullable String artifactId, @Nullable String classifier,
+                               @Nullable String extension, @Nullable String version) {
         this.groupId = Strings.nullToEmpty(groupId);
         this.artifactId = Strings.nullToEmpty(artifactId);
         this.classifier = Strings.nullToEmpty(classifier);

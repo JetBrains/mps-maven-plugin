@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin.mps;
 
 import jetbrains.mps.tool.builder.MpsWorker;
 import org.apache.log4j.Level;

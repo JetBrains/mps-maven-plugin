@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

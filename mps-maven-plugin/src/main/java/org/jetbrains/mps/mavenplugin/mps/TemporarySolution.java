@@ -1,4 +1,4 @@
-package org.jetbrains.mps;
+package org.jetbrains.mps.mavenplugin.mps;
 
 import jetbrains.mps.extapi.persistence.FileBasedModelRoot;
 import jetbrains.mps.persistence.DefaultModelRoot;
@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-class TemporarySolution {
+public class TemporarySolution {
     private final File modelsDirectory;
     private final File outputDirectory;
     private final String namespace;
 
-    TemporarySolution(File modelsDirectory, File outputDirectory, String namespace) {
+    public TemporarySolution(File modelsDirectory, File outputDirectory, String namespace) {
         this.modelsDirectory = modelsDirectory;
         this.outputDirectory = outputDirectory;
         this.namespace = namespace;
@@ -44,7 +44,7 @@ class TemporarySolution {
         return descriptor;
     }
 
-    void writeToFile(File solutionFile) {
+    public void writeToFile(File solutionFile) {
         jetbrains.mps.project.persistence.SolutionDescriptorPersistence.saveSolutionDescriptor(new IoFile(solutionFile.getAbsolutePath()),
                 toSolutionDescriptor(this), new MacroHelper() {
                     @Override
