@@ -12,8 +12,8 @@ deployed from a local installation of MPS using [MPS Maven Deployer](https://git
 
 # Generating Java From MPS Models
 1. Deploy the MPS modules (languages and their required solutions) to the Maven repository using
-   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer). Deploy any other languages that your models
-   use.
+   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer). Deploy any other required languages in the
+   [Module Archive (MAR) format](module-archive-format.html)
 2. Put your models (`*.mps`) into the `src/main/mps` folder.
 3. Add the plugin to your `pom.xml` and configure dependencies on the artifacts deployed in step 1. For example:
 

@@ -24,6 +24,7 @@
         <menu name="Overview">
             <item name="Introduction" href="index.html"/>
             <item name="Goals" href="plugin-info.html"/>
+            <item name="Module Archive Format" href="module-archive-format.html"/>
         </menu>
         <menu ref="reports"/>
     </body>
