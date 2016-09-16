@@ -28,7 +28,7 @@
                                     <groupId>org.jetbrains.mps</groupId>
                                     <artifactId>mps-modules</artifactId>
                                     <version>${mps.version}</version>
-                                    <type>lar</type>
+                                    <type>mar</type>
                                 </dependency>
                             </dependencies>
                         </configuration>

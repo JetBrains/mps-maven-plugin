@@ -126,7 +126,7 @@ public class GenerateJavaMojo extends AbstractMojo {
 
         Map<ArtifactCoordinates, File> result = new HashMap<>(resolvedDependencies);
         for (Map.Entry<ArtifactCoordinates, File> entry : result.entrySet()) {
-            if (!ArtifactTypes.LANGUAGE_ARCHIVE.equals(entry.getKey().extension)) {
+            if (!ArtifactTypes.MODULE_ARCHIVE.equals(entry.getKey().extension)) {
                 continue;
             }
 
