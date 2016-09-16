@@ -11,10 +11,11 @@ The plugin requires MPS deployed in the form of artifacts to a Maven repository.
 deployed from a local installation of MPS using [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer).
 
 # Generating Java From MPS Models
-1. Deploy MPS artifacts to the Maven repository using
-   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer).
+1. Deploy the MPS modules (languages and their required solutions) to the Maven repository using
+   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer). Deploy any other languages that your models
+   use.
 2. Put your models (`*.mps`) into the `src/main/mps` folder.
-3. Add the plugin to your `pom.xml` (set `mpsVersion` to the version of MPS artifacts deployed in step 1):
+3. Add the plugin to your `pom.xml` and configure dependencies on the artifacts deployed in step 1. For example:
 
     ```
     <plugin>
@@ -26,12 +27,19 @@ deployed from a local installation of MPS using [MPS Maven Deployer](https://git
                <goals>
                    <goal>generate-java</goal>
                </goals>
-               <configuration>
-                   <mpsVersion>123.456</mpsVersion>
-               </configuration>
+                <configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jetbrains.mps</groupId>
+                            <artifactId>mps-modules</artifactId>
+                            <version>123.4567</version>
+                            <type>mar</type>
+                        </dependency>
+                    </dependencies>
+                </configuration>
            </execution>
        </executions>
     </plugin>
     ```
 
-4. Run `mvn generate-sources`.
+4. Run `mvn generate-sources` (or any other Maven goal that includes `generate-sources`).
