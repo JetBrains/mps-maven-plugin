@@ -1,26 +1,24 @@
 package org.jetbrains.mps.mavenplugin.mps;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.commons.io.FileUtils;
+import com.google.common.collect.Multimap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.mps.openapi.module.SModuleReference;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class MpsModule {
+    public final Set<SModuleReference> ids;
+    // Maps a module to modules that depend on it
+    public final Multimap<SModuleReference, SModuleReference> dependencyIds;
     public final List<File> libraries;
 
-    public MpsModule(List<File> libraries) {
+    MpsModule(@NotNull Set<SModuleReference> ids, @NotNull Multimap<SModuleReference, SModuleReference> dependencyIds,
+              @NotNull List<File> libraries) {
+        this.ids = ids;
+        this.dependencyIds = dependencyIds;
         this.libraries = libraries;
     }
 
-    public static MpsModule readFromFile(File root) {
-        if (root.isFile()) {
-            return new MpsModule(Collections.singletonList(root));
-        }
-
-        Collection<File> jarFiles = FileUtils.listFiles(root, new String[] {"jar"}, true);
-        return new MpsModule(ImmutableList.copyOf(jarFiles));
-    }
 }
