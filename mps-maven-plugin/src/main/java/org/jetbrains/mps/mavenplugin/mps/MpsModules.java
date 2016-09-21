@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import jetbrains.mps.library.ModulesMiner;
 import jetbrains.mps.project.structure.modules.*;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.mps.openapi.language.SLanguage;
 import org.jetbrains.mps.openapi.module.SDependencyScope;
 import org.jetbrains.mps.openapi.module.SModuleReference;
 
@@ -56,6 +57,13 @@ public class MpsModules {
                 continue;
             }
             result.put(dependency.getModuleRef(), descriptor.getModuleReference());
+        }
+
+        if (descriptor instanceof GeneratorDescriptor) {
+            // Languages used by generators are required during generation
+            for (SLanguage language : descriptor.getLanguageVersions().keySet()) {
+                result.put(language.getSourceModuleReference(), descriptor.getModuleReference());
+            }
         }
     }
 

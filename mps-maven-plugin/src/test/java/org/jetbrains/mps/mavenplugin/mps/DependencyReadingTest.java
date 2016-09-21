@@ -53,6 +53,9 @@ public class DependencyReadingTest {
                 "      <dependencies>\n" +
                 "        <dependency reexport=\"false\">00000000-0000-0000-0000-000000000002(generator-dependency)</dependency>\n" +
                 "      </dependencies>\n" +
+                "      <languageVersions>\n" +
+                "        <language slang=\"l:00000000-0000-0000-0000-000000000005:used-language-in-generator\" version=\"0\" />\n" +
+                "      </languageVersions>\n" +
                 "    </generator>\n" +
                 "  </generators>\n" +
                 "  <dependencies>\n" +
@@ -61,6 +64,9 @@ public class DependencyReadingTest {
                 "  <extendedLanguages>\n" +
                 "    <extendedLanguage>00000000-0000-0000-0000-000000000004(extended-language)</extendedLanguage>\n" +
                 "  </extendedLanguages>\n" +
+                "  <languageVersions>\n" +
+                "    <language slang=\"l:10000000-0000-0000-0000-000000000000:used-language-in-language\" version=\"0\" />\n" +
+                "  </languageVersions>\n" +
                 "</language>";
 
         File extracted = temporaryFolder.newFolder("extracted");
@@ -84,7 +90,8 @@ public class DependencyReadingTest {
                 ModuleReference.parseReference("00000000-0000-0000-0000-000000000001(module-dependency)"),
                 ModuleReference.parseReference("00000000-0000-0000-0000-000000000002(generator-dependency)"),
                 ModuleReference.parseReference("00000000-0000-0000-0000-000000000003(language-dependency)"),
-                ModuleReference.parseReference("00000000-0000-0000-0000-000000000004(extended-language)")));
+                ModuleReference.parseReference("00000000-0000-0000-0000-000000000004(extended-language)"),
+                ModuleReference.parseReference("00000000-0000-0000-0000-000000000005(used-language-in-generator)")));
     }
 
     private static Set<SModuleReference> getDependencyIds(File extracted) {
