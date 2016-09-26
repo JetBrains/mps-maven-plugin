@@ -14,6 +14,19 @@ extension to distinguish it from plain jar files that contain classes or resourc
     mysolution-src.jar
 ```
 
+Hierarchy of folders inside the module archive is supported. Example:
+
+```
+  my-modules.mar
+    languages/
+      mylanguage.jar
+      mylanguage-src.jar
+      mylanguage-generator.jar
+    solutions/
+      mysolution.jar
+      mysolution-src.jar
+```
+
 ## Rationale
 
 Maven expects its artifacts to be self-contained: they should not reference any other artifact or file by name, only via

@@ -17,7 +17,7 @@ deployed from a local installation of MPS using [MPS Maven Deployer](https://git
 2. Put your models (`*.mps`) into the `src/main/mps` folder.
 3. Add the plugin to your `pom.xml` and configure dependencies on the artifacts deployed in step 1. For example:
 
-    ```
+    ```xml
     <plugin>
        <groupId>org.jetbrains.mps</groupId>
        <artifactId>mps-maven-plugin</artifactId>
