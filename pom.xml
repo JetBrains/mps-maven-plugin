@@ -15,7 +15,7 @@
 
     <modules>
         <module>mps-maven-plugin</module>
-        <module>mps-maven-sample</module>
+        <module>samples/hello-world</module>
     </modules>
 
     <properties>

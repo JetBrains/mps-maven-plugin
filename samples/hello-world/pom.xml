@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>mps-maven-sample</artifactId>
-    <name>MPS Maven Plugin Sample</name>
+    <groupId>org.jetbrains.mps.maven.samples</groupId>
+    <artifactId>hello-world</artifactId>
+    <name>MPS Maven Plugin Sample - Hello World</name>
 
     <parent>
         <groupId>org.jetbrains.mps</groupId>
         <artifactId>mps-maven-plugin-parent</artifactId>
-        <relativePath>../</relativePath>
+        <relativePath>../../</relativePath>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
