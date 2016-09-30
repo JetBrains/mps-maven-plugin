@@ -47,4 +47,11 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>deploy-repo</id>
+            <url>${deploy-repo.url}</url>
+        </repository>
+    </distributionManagement>
 </project>
