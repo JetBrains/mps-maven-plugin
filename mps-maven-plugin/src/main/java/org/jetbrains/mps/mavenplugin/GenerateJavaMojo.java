@@ -98,7 +98,7 @@ public class GenerateJavaMojo extends AbstractMojo {
             List<File> libraries = getLibraries(modules.values());
 
             TemporarySolution temporarySolution = new TemporarySolution(
-                    modelsDirectory, outputDirectory, mavenProject.getGroupId() + "." + mavenProject.getArtifactId());
+                    modelsDirectory, outputDirectory, "mpsmavensolution");
 
             File solutionFile = new File(temporaryWorkingDirectory, "solution.msd");
             temporarySolution.writeToFile(solutionFile);
