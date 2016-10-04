@@ -68,23 +68,29 @@ public class GenerateJavaMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         mavenProject.addCompileSourceRoot(outputDirectory.getPath());
-        MavenLogAppender.startPluginLog(this);
+        Map<ArtifactCoordinates, File> resolvedDependencies;
         try {
-            executeWithRedirectedLog4j();
+            resolvedDependencies = resolveDependencies(dependencies);
+        } catch (DependencyResolutionException e) {
+            throw new MojoExecutionException("Error resolving dependencies", e);
+        }
+
+        File temporaryWorkingDirectory = Files.createTempDir();
+
+        try {
+            Map<ArtifactCoordinates, File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
+            launchMps(extractedDependencies, temporaryWorkingDirectory);
         } catch (Exception e) {
             Throwables.propagateIfPossible(e, MojoExecutionException.class, MojoFailureException.class);
             throw new MojoExecutionException("Unexpected exception", e);
         } finally {
-            MavenLogAppender.endPluginLog(this);
+            tryDeletingDirectory(temporaryWorkingDirectory);
         }
     }
 
-    private void executeWithRedirectedLog4j() throws Exception {
-        Map<ArtifactCoordinates, File> resolvedDependencies = resolveDependencies(dependencies);
-
-        File temporaryWorkingDirectory = Files.createTempDir();
+    private void launchMps(Map<ArtifactCoordinates, File> extractedDependencies, File temporaryWorkingDirectory) throws MojoExecutionException {
+        MavenLogAppender.startPluginLog(this);
         try {
-            Map<ArtifactCoordinates, File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
             Map<ArtifactCoordinates, MpsModule> modules = readModules(extractedDependencies);
 
             checkModulesForMissingOrDuplicates(modules);
@@ -102,7 +108,7 @@ public class GenerateJavaMojo extends AbstractMojo {
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         } finally {
-            tryDeletingDirectory(temporaryWorkingDirectory);
+            MavenLogAppender.endPluginLog(this);
         }
     }
 
