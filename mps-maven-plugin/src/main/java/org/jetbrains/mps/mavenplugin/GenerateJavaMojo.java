@@ -5,7 +5,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.pyx4j.log4j.MavenLogAppender;
 import jetbrains.mps.library.ModulesMiner;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;

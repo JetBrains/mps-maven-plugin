@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//log4j//DTD//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+ <!-- @version $Revision: 1 $ ($Author: vlads $) $Date: 2007-03-08 23:03:48 -0500 (Thu, 08 Mar 2007) $ -->
+<log4j:configuration>
+
+    <appender name="MavenLogAppender" class="org.jetbrains.mps.mavenplugin.mps.MavenLogAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m" />
+        </layout>
+    </appender>
+
+    <root>
+        <level value="debug" />
+        <appender-ref ref="MavenLogAppender" />
+    </root>
+
+</log4j:configuration>
