@@ -8,11 +8,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-public class MpsModule {
-    public final Set<SModuleReference> ids;
+class MpsModule {
+    private final Set<SModuleReference> ids;
     // Maps a module to modules that depend on it
-    public final Multimap<SModuleReference, SModuleReference> dependencyIds;
-    public final List<File> libraries;
+    private final Multimap<SModuleReference, SModuleReference> dependencyIds;
+    final List<File> libraries;
 
     MpsModule(@NotNull Set<SModuleReference> ids, @NotNull Multimap<SModuleReference, SModuleReference> dependencyIds,
               @NotNull List<File> libraries) {

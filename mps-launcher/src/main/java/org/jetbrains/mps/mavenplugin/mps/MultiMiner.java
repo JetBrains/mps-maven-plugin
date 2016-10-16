@@ -12,15 +12,15 @@ import java.util.Collection;
 /**
  * Multiple-use interface to {@link jetbrains.mps.library.ModulesMiner}.
  */
-public class MultiMiner implements AutoCloseable {
+class MultiMiner implements AutoCloseable {
     private final ComponentTracker componentTracker = new ComponentTracker();
 
-    public MultiMiner() {
+    MultiMiner() {
         PersistenceRegistry persistenceRegistry = componentTracker.init(new PersistenceRegistry());
         componentTracker.init(new JavaClassesPersistence(persistenceRegistry));
     }
 
-    public Collection<ModulesMiner.ModuleHandle> collectModules(File file) {
+    Collection<ModulesMiner.ModuleHandle> collectModules(File file) {
         return new ModulesMiner().collectModules(new IoFile(file.getAbsolutePath())).getCollectedModules();
     }
 

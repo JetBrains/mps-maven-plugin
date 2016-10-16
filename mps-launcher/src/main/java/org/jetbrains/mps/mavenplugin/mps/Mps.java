@@ -1,16 +1,22 @@
 package org.jetbrains.mps.mavenplugin.mps;
 
 import com.google.common.collect.Lists;
+import jetbrains.mps.library.ModulesMiner;
 import jetbrains.mps.tool.builder.make.GeneratorWorker;
 import jetbrains.mps.tool.common.JavaCompilerProperties;
 import jetbrains.mps.tool.common.Script;
 import org.apache.log4j.Level;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Mps {
-    public static void runGenerator(Log log, GeneratorInput generatorInput) {
+    private static void runGenerator(Log log, GeneratorInput generatorInput) {
         Script script = toScript(generatorInput);
         new GeneratorWorker(script, new MpsToMavenLogger(log)).work();
     }
@@ -37,5 +43,39 @@ public class Mps {
         for (File file : libraryJars) {
             script.addLibraryJar(file.getAbsolutePath());
         }
+    }
+
+    public static void launchMps(Iterable<File> extractedDependencies, File temporaryWorkingDirectory, TemporarySolution temporarySolution, Log mavenLog) throws MojoExecutionException {
+        MavenLogAppender.startPluginLog(mavenLog);
+        try {
+            Collection<MpsModule> modules = readModules(extractedDependencies);
+
+            List<File> libraries = getLibraries(modules);
+
+            File solutionFile = new File(temporaryWorkingDirectory, "solution.msd");
+            temporarySolution.writeToFile(solutionFile);
+
+            GeneratorInput generatorInput = new GeneratorInput(solutionFile, libraries);
+            runGenerator(mavenLog, generatorInput);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } finally {
+            MavenLogAppender.endPluginLog();
+        }
+    }
+
+    private static Collection<MpsModule> readModules(Iterable<File> extractedDependencies) {
+        try (MultiMiner miner = new MultiMiner()) {
+            ArrayList<MpsModule> modules = new ArrayList<>();
+            for (File root : extractedDependencies) {
+                Collection<ModulesMiner.ModuleHandle> moduleHandles = miner.collectModules(root);
+                modules.add(MpsModules.fromRootAndModuleHandles(root, moduleHandles));
+            }
+            return modules;
+        }
+    }
+
+    private static List<File> getLibraries(Collection<MpsModule> values) {
+        return values.stream().flatMap(m -> m.libraries.stream()).collect(Collectors.toList());
     }
 }

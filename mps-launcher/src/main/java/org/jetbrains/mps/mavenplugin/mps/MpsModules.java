@@ -16,9 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class MpsModules {
+class MpsModules {
 
-    public static MpsModule fromRootAndModuleHandles(File root, Collection<ModulesMiner.ModuleHandle> moduleHandles) {
+    static MpsModule fromRootAndModuleHandles(File root, Collection<ModulesMiner.ModuleHandle> moduleHandles) {
         return new MpsModule(getModuleIds(moduleHandles), getDependencyIds(moduleHandles), getLibraries(root));
     }
 

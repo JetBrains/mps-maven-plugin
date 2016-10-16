@@ -2,7 +2,6 @@ package org.jetbrains.mps.mavenplugin;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import jetbrains.mps.library.ModulesMiner;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
@@ -22,7 +21,8 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.mps.mavenplugin.mps.*;
+import org.jetbrains.mps.mavenplugin.mps.Mps;
+import org.jetbrains.mps.mavenplugin.mps.TemporarySolution;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,50 +74,14 @@ public class GenerateJavaMojo extends AbstractMojo {
 
         try {
             Collection<File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
-            launchMps(extractedDependencies, temporaryWorkingDirectory);
+            Mps.launchMps(extractedDependencies, temporaryWorkingDirectory, new TemporarySolution(
+                    modelsDirectory, outputDirectory, "mpsmavensolution"), getLog());
         } catch (Exception e) {
             Throwables.propagateIfPossible(e, MojoExecutionException.class, MojoFailureException.class);
             throw new MojoExecutionException("Unexpected exception", e);
         } finally {
             tryDeletingDirectory(temporaryWorkingDirectory);
         }
-    }
-
-    private void launchMps(Iterable<File> extractedDependencies, File temporaryWorkingDirectory) throws MojoExecutionException {
-        MavenLogAppender.startPluginLog(this);
-        try {
-            Collection<MpsModule> modules = readModules(extractedDependencies);
-
-            List<File> libraries = getLibraries(modules);
-
-            TemporarySolution temporarySolution = new TemporarySolution(
-                    modelsDirectory, outputDirectory, "mpsmavensolution");
-
-            File solutionFile = new File(temporaryWorkingDirectory, "solution.msd");
-            temporarySolution.writeToFile(solutionFile);
-
-            GeneratorInput generatorInput = new GeneratorInput(solutionFile, libraries);
-            Mps.runGenerator(getLog(), generatorInput);
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            MavenLogAppender.endPluginLog(this);
-        }
-    }
-
-    private Collection<MpsModule> readModules(Iterable<File> extractedDependencies) {
-        try (MultiMiner miner = new MultiMiner()) {
-            ArrayList<MpsModule> modules = new ArrayList<>();
-            for (File root : extractedDependencies) {
-                Collection<ModulesMiner.ModuleHandle> moduleHandles = miner.collectModules(root);
-                modules.add(MpsModules.fromRootAndModuleHandles(root, moduleHandles));
-            }
-            return modules;
-        }
-    }
-
-    private static List<File> getLibraries(Collection<MpsModule> values) {
-        return values.stream().flatMap(m -> m.libraries.stream()).collect(Collectors.toList());
     }
 
     private Collection<File> extractDependencies(Map<ArtifactCoordinates, File> resolvedDependencies,

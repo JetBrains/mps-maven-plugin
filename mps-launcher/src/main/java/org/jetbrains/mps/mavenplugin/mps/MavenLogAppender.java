@@ -10,14 +10,14 @@ public class MavenLogAppender extends AppenderSkeleton {
 	
 	private static Log mavenLog;
 
-	public static void startPluginLog(AbstractMojo mojo) {
-		mavenLog = mojo.getLog();
-	}
+    public static void startPluginLog(Log mavenLog) {
+	    MavenLogAppender.mavenLog = mavenLog;
+    }
 
-	public static void endPluginLog(AbstractMojo mojo) {
+    public static void endPluginLog() {
 		mavenLog = null;
 	}
-	
+
 	protected void append(LoggingEvent event) {
 		if (mavenLog == null) {
 			return;

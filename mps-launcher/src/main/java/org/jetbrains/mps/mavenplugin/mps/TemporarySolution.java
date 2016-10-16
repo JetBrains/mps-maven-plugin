@@ -44,7 +44,7 @@ public class TemporarySolution {
         return descriptor;
     }
 
-    public void writeToFile(File solutionFile) {
+    void writeToFile(File solutionFile) {
         jetbrains.mps.project.persistence.SolutionDescriptorPersistence.saveSolutionDescriptor(new IoFile(solutionFile.getAbsolutePath()),
                 toSolutionDescriptor(this), new MacroHelper() {
                     @Override
