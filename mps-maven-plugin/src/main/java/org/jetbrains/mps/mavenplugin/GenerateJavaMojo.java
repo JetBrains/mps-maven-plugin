@@ -1,9 +1,6 @@
 package org.jetbrains.mps.mavenplugin;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import jetbrains.mps.library.ModulesMiner;
 import org.apache.commons.io.FileUtils;
@@ -26,7 +23,6 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.mps.mavenplugin.mps.*;
-import org.jetbrains.mps.openapi.module.SModuleReference;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +73,7 @@ public class GenerateJavaMojo extends AbstractMojo {
         File temporaryWorkingDirectory = Files.createTempDir();
 
         try {
-            Map<ArtifactCoordinates, File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
+            Collection<File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
             launchMps(extractedDependencies, temporaryWorkingDirectory);
         } catch (Exception e) {
             Throwables.propagateIfPossible(e, MojoExecutionException.class, MojoFailureException.class);
@@ -87,14 +83,12 @@ public class GenerateJavaMojo extends AbstractMojo {
         }
     }
 
-    private void launchMps(Map<ArtifactCoordinates, File> extractedDependencies, File temporaryWorkingDirectory) throws MojoExecutionException {
+    private void launchMps(Iterable<File> extractedDependencies, File temporaryWorkingDirectory) throws MojoExecutionException {
         MavenLogAppender.startPluginLog(this);
         try {
-            Map<ArtifactCoordinates, MpsModule> modules = readModules(extractedDependencies);
+            Collection<MpsModule> modules = readModules(extractedDependencies);
 
-            checkModulesForMissingOrDuplicates(modules);
-
-            List<File> libraries = getLibraries(modules.values());
+            List<File> libraries = getLibraries(modules);
 
             TemporarySolution temporarySolution = new TemporarySolution(
                     modelsDirectory, outputDirectory, "mpsmavensolution");
@@ -111,56 +105,12 @@ public class GenerateJavaMojo extends AbstractMojo {
         }
     }
 
-    private static void checkModulesForMissingOrDuplicates(Map<ArtifactCoordinates, MpsModule> modules) throws MojoFailureException {
-        Multimap<SModuleReference, ArtifactCoordinates> moduleCoordinates = HashMultimap.create(modules.size(), 1);
-        Multimap<SModuleReference, SModuleReference> dependingModules = HashMultimap.create(modules.size(), 10);
-
-        for (Map.Entry<ArtifactCoordinates, MpsModule> entry : modules.entrySet()) {
-            MpsModule mpsModule = entry.getValue();
-            ArtifactCoordinates artifactCoordinates = entry.getKey();
-            for (SModuleReference id : mpsModule.ids) {
-                moduleCoordinates.put(id, artifactCoordinates);
-            }
-
-            dependingModules.putAll(mpsModule.dependencyIds);
-        }
-
-        StringBuilder errors = new StringBuilder();
-
-        for (Map.Entry<SModuleReference, Collection<ArtifactCoordinates>> entry : moduleCoordinates.asMap().entrySet()) {
-            if (entry.getValue().size() > 1) {
-                errors.append("Module ").append(entry.getKey()).append(" is contained in multiple artifacts:\n");
-                for (ArtifactCoordinates coordinates : entry.getValue()) {
-                    errors.append("  ").append(coordinates).append('\n');
-                }
-            }
-        }
-
-        dependingModules.keys().removeAll(moduleCoordinates.keys());
-
-        for (Map.Entry<SModuleReference, Collection<SModuleReference>> entry : dependingModules.asMap().entrySet()) {
-            errors.append("Required module ").append(entry.getKey()).append(" was not found in dependencies:\n");
-            for (SModuleReference requiredBy : entry.getValue()) {
-                errors.append("  required by ").append(requiredBy).append(" in ");
-                Joiner.on(", ").appendTo(errors, moduleCoordinates.get(requiredBy));
-                errors.append("\n");
-            }
-        }
-
-        String errorsString = errors.toString();
-        if (errorsString.isEmpty()) {
-            return;
-        }
-        throw new MojoFailureException(errorsString);
-    }
-
-    private Map<ArtifactCoordinates, MpsModule> readModules(Map<ArtifactCoordinates, File> extractedDependencies) {
+    private Collection<MpsModule> readModules(Iterable<File> extractedDependencies) {
         try (MultiMiner miner = new MultiMiner()) {
-            Map<ArtifactCoordinates, MpsModule> modules = new HashMap<>();
-            for (Map.Entry<ArtifactCoordinates, File> entry : extractedDependencies.entrySet()) {
-                File root = entry.getValue();
+            ArrayList<MpsModule> modules = new ArrayList<>();
+            for (File root : extractedDependencies) {
                 Collection<ModulesMiner.ModuleHandle> moduleHandles = miner.collectModules(root);
-                modules.put(entry.getKey(), MpsModules.fromRootAndModuleHandles(root, moduleHandles));
+                modules.add(MpsModules.fromRootAndModuleHandles(root, moduleHandles));
             }
             return modules;
         }
@@ -170,13 +120,14 @@ public class GenerateJavaMojo extends AbstractMojo {
         return values.stream().flatMap(m -> m.libraries.stream()).collect(Collectors.toList());
     }
 
-    private Map<ArtifactCoordinates, File> extractDependencies(Map<ArtifactCoordinates, File> resolvedDependencies,
-                                                               File temporaryWorkingDirectory) throws IOException {
+    private Collection<File> extractDependencies(Map<ArtifactCoordinates, File> resolvedDependencies,
+                                                 File temporaryWorkingDirectory) throws IOException {
         ZipExtractor extractor = new ZipExtractor(getLog());
 
-        Map<ArtifactCoordinates, File> result = new HashMap<>(resolvedDependencies);
-        for (Map.Entry<ArtifactCoordinates, File> entry : result.entrySet()) {
+        List<File> result = new ArrayList<>(resolvedDependencies.size());
+        for (Map.Entry<ArtifactCoordinates, File> entry : resolvedDependencies.entrySet()) {
             if (!ArtifactTypes.MODULE_ARCHIVE.equals(entry.getKey().extension)) {
+                result.add(entry.getValue());
                 continue;
             }
 
@@ -186,7 +137,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                         entry.getValue(), dir));
             }
             extractor.extract(entry.getValue(), dir);
-            entry.setValue(dir);
+            result.add(dir);
         }
 
         return result;
