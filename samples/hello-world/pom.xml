@@ -24,6 +24,12 @@
                             <goal>generate-java</goal>
                         </goals>
                         <configuration>
+                            <mps>
+                                <groupId>com.jetbrains</groupId>
+                                <artifactId>mps</artifactId>
+                                <version>3.4</version>
+                                <type>zip</type>
+                            </mps>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.jetbrains.mps</groupId>

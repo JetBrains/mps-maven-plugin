@@ -1,4 +1,4 @@
-package org.jetbrains.mps.mavenplugin.mps;
+package org.jetbrains.mps.maven.driver;
 
 import jetbrains.mps.extapi.persistence.FileBasedModelRoot;
 import jetbrains.mps.persistence.DefaultModelRoot;
@@ -11,18 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.file.Path;
 
-public class TemporarySolution {
-    private final File modelsDirectory;
-    private final File outputDirectory;
-    private final String namespace;
-
-    public TemporarySolution(File modelsDirectory, File outputDirectory, String namespace) {
-        this.modelsDirectory = modelsDirectory;
-        this.outputDirectory = outputDirectory;
-        this.namespace = namespace;
-    }
-
+public class TemporarySolutionIO {
     @NotNull
     private static ModelRootDescriptor newModelRootDescriptor(File modelsDirectory) {
         DefaultModelRoot modelRoot = new DefaultModelRoot();
@@ -38,15 +29,16 @@ public class TemporarySolution {
         SolutionDescriptor descriptor = new SolutionDescriptor();
         descriptor.getModelRootDescriptors().add(newModelRootDescriptor(solution.modelsDirectory));
         descriptor.setOutputPath(solution.outputDirectory.getAbsolutePath());
-        descriptor.setNamespace(solution.namespace);
-        descriptor.setId(ModuleId.foreign(solution.namespace));
+        descriptor.setNamespace("mpsmaventemp");
+        descriptor.setId(ModuleId.foreign("mpsmaventemp"));
         descriptor.setCompileInMPS(false);
         return descriptor;
     }
 
-    void writeToFile(File solutionFile) {
-        jetbrains.mps.project.persistence.SolutionDescriptorPersistence.saveSolutionDescriptor(new IoFile(solutionFile.getAbsolutePath()),
-                toSolutionDescriptor(this), new MacroHelper() {
+    static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) {
+        jetbrains.mps.project.persistence.SolutionDescriptorPersistence.saveSolutionDescriptor(
+                new IoFile(solutionFile.toAbsolutePath().toString()),
+                toSolutionDescriptor(temporarySolution), new MacroHelper() {
                     @Override
                     public String expandPath(@Nullable String path) {
                         return path;

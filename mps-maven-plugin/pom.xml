@@ -43,12 +43,6 @@
             <artifactId>maven-core</artifactId>
             <version>${maven.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-libs</artifactId>
-            <version>${mps.version}</version>
-        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

@@ -1,0 +1,80 @@
+package org.jetbrains.mps.maven.driver;
+
+import jetbrains.mps.tool.builder.MpsWorker;
+import jetbrains.mps.tool.builder.make.GeneratorWorker;
+import jetbrains.mps.tool.common.GeneratorInput;
+import jetbrains.mps.tool.common.JavaCompilerProperties;
+import jetbrains.mps.tool.common.Script;
+import org.apache.log4j.Level;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+
+/**
+ * Entry point for executing code in the context of MPS classloaders. Called by
+ * {@link jetbrains.mps.tool.builder.AntBootstrap} which is executed by {@code org.jetbrains.mps.mavenplugin.mps.Mps2}.
+ */
+public class Driver {
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Expected exactly one argument, got " + args.length);
+            System.exit(1);
+        }
+        String inputFileName = args[0];
+
+        GeneratorInput input;
+        try (InputStream is = new FileInputStream(inputFileName);
+             ObjectInputStream ois = new ObjectInputStream(is)) {
+            input = (GeneratorInput) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            throw new AssertionError(e);
+        }
+
+        TemporarySolution solution = new TemporarySolution(input.modelsDirectory, input.outputDirectory);
+        Path solutionFile;
+        try {
+            solutionFile = Files.createTempFile("mpsmaven", ".msd");
+            TemporarySolutionIO.writeToFile(solution, solutionFile);
+        } catch (IOException e) {
+            System.err.println("Error creating temporary file");
+            e.printStackTrace();
+            System.exit(1);
+            throw new AssertionError(e);
+        }
+
+        Script script = toScript(solutionFile, input);
+
+        GeneratorWorker worker = new GeneratorWorker(script, new MpsWorker.SystemOutLogger());
+
+        // workFromMain calls System.exit() with appropriate exit code.
+        worker.workFromMain();
+    }
+
+    private static Script toScript(Path solutionFile, GeneratorInput generatorInput) {
+        Script script = new Script();
+        script.updateLogLevel(Level.TRACE);
+
+        // Disable loading bootstrap libraries, otherwise MPS looks for them in some lib folder under some home path
+        // and the plugin doesn't provide anything like that, so it fails.
+        script.setLoadBootstrapLibraries(false);
+
+        // Leave compilation to Maven. We can do it since we generate one module at a time, and it lets us (and the
+        // plugin user) control the compilation process.
+        new JavaCompilerProperties(script).setSkipCompilation(true);
+
+        addLibraryJarsToScript(script, generatorInput.libraryJars);
+
+        script.addChunk(Collections.singletonList(solutionFile.toAbsolutePath().toString()), false);
+        return script;
+    }
+
+    private static void addLibraryJarsToScript(Script script, Iterable<File> libraryJars) {
+        for (File file : libraryJars) {
+            script.addLibraryJar(file.getAbsolutePath());
+        }
+    }
+}
