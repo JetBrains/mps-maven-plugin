@@ -49,8 +49,6 @@ public class Mps2 {
         classPaths.addAll(calculateMpsClassPath(generatorStartupInfo.mpsHome));
         classPaths.addAll(generatorStartupInfo.driverClassPath);
 
-        String currentClassPathString = System.getProperty("java.class.path");
-
         CommandLine commandLine = new CommandLine(System.getProperty("java.home") + "/bin/java");
         commandLine.addArguments(DEFAULT_JVM_ARGS);
         // TODO allow overriding JVM args
@@ -58,15 +56,6 @@ public class Mps2 {
         StringBuilder sb = new StringBuilder();
         Set<String> entries = new HashSet<>();
 
-
-//        for (String entry : currentClassPathString.split(File.pathSeparator)) {
-//            if (!(entries.contains(entry)) && !(startsWith(entry, javaHome))) {
-//                entries.add(entry);
-//                sb.append(pathSeparator);
-//                sb.append(entry);
-//                pathSeparator = File.pathSeparator;
-//            }
-//        }
         for (File cp : classPaths) {
             String entry = cp.getAbsolutePath();
             if (!(entries.contains(entry))) {
