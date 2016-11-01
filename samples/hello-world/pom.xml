@@ -30,14 +30,6 @@
                                 <version>3.4</version>
                                 <type>zip</type>
                             </mps>
-                            <dependencies>
-                                <dependency>
-                                    <groupId>org.jetbrains.mps</groupId>
-                                    <artifactId>mps-modules</artifactId>
-                                    <version>${mps.version}</version>
-                                    <type>mar</type>
-                                </dependency>
-                            </dependencies>
                         </configuration>
                     </execution>
                 </executions>
