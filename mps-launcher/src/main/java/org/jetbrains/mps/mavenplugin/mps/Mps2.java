@@ -45,8 +45,7 @@ public class Mps2 {
 
     private static CommandLine getCommandLine(GeneratorStartupInfo generatorStartupInfo, GeneratorInput input) throws MojoExecutionException, MojoFailureException {
         Collection<File> classPaths = new ArrayList<>();
-        String javaHome = System.getProperty("java.home");
-        classPaths.add(new File(javaHome, "../lib/tools.jar"));
+        classPaths.add(getToolsJar());
         classPaths.addAll(calculateMpsClassPath(generatorStartupInfo.mpsHome));
         classPaths.addAll(generatorStartupInfo.driverClassPath);
 
@@ -95,6 +94,11 @@ public class Mps2 {
 
         commandLine.addArgument(inputFile.toAbsolutePath().toString());
         return commandLine;
+    }
+
+    private static File getToolsJar() {
+        String javaHome = System.getProperty("java.home");
+        return new File(javaHome, "../lib/tools.jar");
     }
 
     private static boolean startsWith(String path, String prefix) {
