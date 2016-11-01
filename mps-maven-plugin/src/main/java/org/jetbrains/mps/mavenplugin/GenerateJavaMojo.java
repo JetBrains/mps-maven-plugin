@@ -3,7 +3,7 @@ package org.jetbrains.mps.mavenplugin;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.io.Files;
-import jetbrains.mps.tool.common.GeneratorInput;
+import org.jetbrains.mps.maven.driver.GeneratorInput;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;

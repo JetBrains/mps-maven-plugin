@@ -2,7 +2,6 @@ package org.jetbrains.mps.maven.driver;
 
 import jetbrains.mps.tool.builder.MpsWorker;
 import jetbrains.mps.tool.builder.make.GeneratorWorker;
-import jetbrains.mps.tool.common.GeneratorInput;
 import jetbrains.mps.tool.common.JavaCompilerProperties;
 import jetbrains.mps.tool.common.Script;
 import org.apache.log4j.Level;

@@ -1,4 +1,4 @@
-package jetbrains.mps.tool.common;
+package org.jetbrains.mps.maven.driver;
 
 import java.io.File;
 import java.io.Serializable;
