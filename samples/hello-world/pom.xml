@@ -25,9 +25,9 @@
                         </goals>
                         <configuration>
                             <mps>
-                                <groupId>com.jetbrains</groupId>
+                                <groupId>org.jetbrains.mps</groupId>
                                 <artifactId>mps</artifactId>
-                                <version>3.4</version>
+                                <version>${mps.version}</version>
                                 <type>zip</type>
                             </mps>
                         </configuration>
