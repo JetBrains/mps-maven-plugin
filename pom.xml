@@ -16,7 +16,6 @@
     <modules>
         <module>mps-maven-plugin</module>
         <module>mps-launchee</module>
-        <module>mps-launcher</module>
         <module>mps-launcher-common</module>
         <module>samples/hello-world</module>
     </modules>

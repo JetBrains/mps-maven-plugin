@@ -1,4 +1,4 @@
-package org.jetbrains.mps.mavenplugin.mps;
+package org.jetbrains.mps.mavenplugin;
 
 import jetbrains.mps.tool.common.GeneratorInput;
 import jetbrains.mps.tool.common.GeneratorStartupInfo;
@@ -15,10 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class Mps2 {
+class Mps {
     private static final String[] DEFAULT_JVM_ARGS = new String[]{"-Xss1024k", "-Xmx512m", "-XX:MaxPermSize=92m", "-XX:+HeapDumpOnOutOfMemoryError"};
 
-    public static void launchMps(GeneratorStartupInfo generatorStartupInfo, GeneratorInput input, Log mavenLog) throws MojoExecutionException, MojoFailureException {
+    static void launchMps(GeneratorStartupInfo generatorStartupInfo, GeneratorInput input, Log mavenLog) throws MojoExecutionException, MojoFailureException {
         CommandLine commandLine = getCommandLine(generatorStartupInfo, input);
         DefaultExecutor executor = new DefaultExecutor();
 
@@ -88,10 +88,6 @@ public class Mps2 {
     private static File getToolsJar() {
         String javaHome = System.getProperty("java.home");
         return new File(javaHome, "../lib/tools.jar");
-    }
-
-    private static boolean startsWith(String path, String prefix) {
-        return path.startsWith(prefix) && (path.length() == prefix.length() || prefix.endsWith(File.separator) || path.charAt(prefix.length()) == File.separatorChar);
     }
 
     private static Collection<File> calculateMpsClassPath(File mpsHome) throws MojoFailureException {

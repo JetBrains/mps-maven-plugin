@@ -16,6 +16,13 @@
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.mps</groupId>
+            <artifactId>mps-launcher-common</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- Dependencies provided by MPS -->
+        <dependency>
+            <groupId>org.jetbrains.mps</groupId>
             <artifactId>mps-libs</artifactId>
             <version>162.1616</version>
             <scope>provided</scope>
@@ -27,13 +34,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.mps</groupId>
-            <artifactId>mps-launcher-common</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

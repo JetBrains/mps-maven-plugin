@@ -26,7 +26,6 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.mps.mavenplugin.mps.Mps2;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,7 +107,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                     "org.jetbrains.mps.maven.driver.Driver",
                     driverClassPath);
 
-            Mps2.launchMps(startupInfo, new GeneratorInput(mavenProject.getBasedir(),
+            Mps.launchMps(startupInfo, new GeneratorInput(mavenProject.getBasedir(),
                             modelsDirectory, outputDirectory, getJars(extractedDependencies.values())),
                     getLog());
         } catch (Exception e) {
