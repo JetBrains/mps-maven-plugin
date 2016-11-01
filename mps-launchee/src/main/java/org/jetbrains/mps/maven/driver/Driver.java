@@ -58,12 +58,11 @@ public class Driver {
         Script script = new Script();
         script.updateLogLevel(Level.TRACE);
 
-        // Disable loading bootstrap libraries, otherwise MPS looks for them in some lib folder under some home path
-        // and the plugin doesn't provide anything like that, so it fails.
-        script.setLoadBootstrapLibraries(false);
-
         // Leave compilation to Maven. We can do it since we generate one module at a time, and it lets us (and the
         // plugin user) control the compilation process.
+        //
+        // Also, enabling the Java compilation currently makes the build of hello-world sample fail, reasons not yet
+        // investigated.
         new JavaCompilerProperties(script).setSkipCompilation(true);
 
         addLibraryJarsToScript(script, generatorInput.libraryJars);
