@@ -15,8 +15,8 @@
 
     <modules>
         <module>mps-maven-plugin</module>
-        <module>mps-launchee</module>
-        <module>mps-launcher-common</module>
+        <module>mps-driver</module>
+        <module>mps-driver-api</module>
         <module>samples/hello-world</module>
     </modules>
 

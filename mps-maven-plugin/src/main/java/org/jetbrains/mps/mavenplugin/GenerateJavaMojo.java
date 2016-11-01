@@ -40,7 +40,7 @@ public class GenerateJavaMojo extends AbstractMojo {
 
     private static final String MY_KEY = "org.jetbrains.mps:mps-maven-plugin";
     private static final String DRIVER_GROUP_ID = "org.jetbrains.mps";
-    private static final String DRIVER_ARTIFACT_ID = "mps-launchee";
+    private static final String DRIVER_ARTIFACT_ID = "mps-driver";
 
     /**
      * Input directory containing MPS models
