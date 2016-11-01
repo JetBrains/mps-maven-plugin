@@ -1,3 +1,9 @@
-This module contains functionality that runs in a separate process, in the context of a particular version of MPS. This
-is in contrast to the main `mps-maven-plugin` module which is MPS version-independent. There must therefore be no
-compile- or run-time dependency from `mps-maven-plugin` on this module.
+# MPS Driver
+
+MPS Driver is a Java application (i.e. it has a `main` method) that runs in the context of a particular version of MPS
+(i.e. having MPS classes on class path).
+
+`mps-maven-plugin` does not depend on this module directly or indirectly. Instead, the plugin starts `Driver` in
+a separate process with appropriate class path and pass it a serialized instance of a class defined in `mps-driver-api`.
+
+See Javadoc for more details.
