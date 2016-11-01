@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.nio.file.Path;
 
-public class TemporarySolutionIO {
+class TemporarySolutionIO {
     @NotNull
     private static ModelRootDescriptor newModelRootDescriptor(File modelsDirectory) {
         DefaultModelRoot modelRoot = new DefaultModelRoot();
