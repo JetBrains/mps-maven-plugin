@@ -1,7 +1,6 @@
 package org.jetbrains.mps.mavenplugin;
 
 import jetbrains.mps.tool.common.GeneratorInput;
-import jetbrains.mps.tool.common.GeneratorStartupInfo;
 import org.apache.commons.exec.*;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
