@@ -7,13 +7,14 @@ integrate MPS into Maven-based continuous integration builds.
 The MPS Maven Plugin has a single goal, [`mps:generate-java`](generate-java-mojo.html).
 
 # Prerequisites
-The plugin requires MPS deployed in the form of artifacts to a Maven repository. These artifacts can be created and
-deployed from a local installation of MPS using [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer).
+The plugin requires an MPS distribution deployed as an artifact to a Maven repository.
+[MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer) is a Gradle script that automates downloading an
+MPS distribution, repackaging it as a Maven artifact and deploying it to a Maven repository.
 
 # Generating Java From MPS Models
 1. Deploy the MPS modules (languages and their required solutions) to the Maven repository using
-   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer). Deploy any other required languages in the
-   [Module Archive (MAR) format](module-archive-format.html)
+   [MPS Maven Deployer](https://github.com/JetBrains/mps-maven-deployer). Deploy any other required modules either as
+   individual JARs or as ZIPs of JARs. See [Packaging Modules For `mps-maven-plugin`](packaging-modules.html)
 2. Put your models (`*.mps`) into the `src/main/mps` folder.
 3. Add the plugin to your `pom.xml` and configure dependencies on the artifacts deployed in step 1. For example:
 
@@ -28,12 +29,18 @@ deployed from a local installation of MPS using [MPS Maven Deployer](https://git
                    <goal>generate-java</goal>
                </goals>
                 <configuration>
+                    <mps>
+                        <groupId>org.jetbrains.mps</groupId>
+                        <artifactId>mps</artifactId>
+                        <version>3.4.1</version>
+                        <type>zip</type>
+                    </mps>
                     <dependencies>
                         <dependency>
-                            <groupId>org.jetbrains.mps</groupId>
-                            <artifactId>mps-modules</artifactId>
-                            <version>123.4567</version>
-                            <type>mar</type>
+                            <groupId>com.acme</groupId>
+                            <artifactId>awesome-languages</artifactId>
+                            <version>1.0</version>
+                            <type>zip</type>
                         </dependency>
                     </dependencies>
                 </configuration>

@@ -162,7 +162,7 @@ public class GenerateJavaMojo extends AbstractMojo {
     private static File extractDependency(File temporaryWorkingDirectory, ZipExtractor extractor,
                                           ArtifactCoordinates artifactCoordinates, File artifactFile) throws IOException {
         File extractedRoot;
-        if (!ArtifactTypes.MODULE_ARCHIVE.equals(artifactCoordinates.extension) && !ArtifactTypes.ZIP.equals(artifactCoordinates.extension)) {
+        if (!ArtifactTypes.ZIP.equals(artifactCoordinates.extension)) {
             extractedRoot = artifactFile;
         } else {
             File dir = new File(temporaryWorkingDirectory, artifactFile.getName());
