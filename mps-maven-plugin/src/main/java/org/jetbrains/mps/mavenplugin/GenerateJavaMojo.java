@@ -87,7 +87,9 @@ public class GenerateJavaMojo extends AbstractMojo {
 
         try {
             Map<ArtifactCoordinates, File> extractedDependencies = extractDependencies(resolvedDependencies, temporaryWorkingDirectory);
-            File mpsHome = extractedDependencies.get(toCoordinates(mps));
+
+            // Remove MPS from extracted dependencies so that its jars are not needlessly included into generator input libraries
+            File mpsHome = extractedDependencies.remove(toCoordinates(mps));
 
             Dependency driver = new Dependency();
             driver.setGroupId(DRIVER_GROUP_ID);
