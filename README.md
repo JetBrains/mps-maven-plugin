@@ -1,3 +1,4 @@
+[![JetBrains team project](http://jb.gg/badges/team-flat-square.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 # MPS Maven Plugin
 `mps-maven-plugin` generates code from [JetBrains MPS](http://www.jetbrains.com/mps/) models created using MPS language
 plugins for IntelliJ IDEA. The plugin does not require MPS to be installed on the machine and thus helps integrate MPS
