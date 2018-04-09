@@ -1,5 +1,6 @@
 package org.jetbrains.mps.maven.driver;
 
+import jetbrains.mps.project.io.DescriptorIOException;
 import jetbrains.mps.tool.builder.MpsWorker;
 import jetbrains.mps.tool.builder.make.GeneratorWorker;
 import jetbrains.mps.tool.common.JavaCompilerProperties;
@@ -38,7 +39,7 @@ public class Driver {
         try {
             solutionFile = Files.createTempFile("mpsmaven", ".msd");
             TemporarySolutionIO.writeToFile(solution, solutionFile);
-        } catch (IOException e) {
+        } catch (IOException | DescriptorIOException e) {
             System.err.println("Error creating temporary file");
             e.printStackTrace();
             System.exit(1);
