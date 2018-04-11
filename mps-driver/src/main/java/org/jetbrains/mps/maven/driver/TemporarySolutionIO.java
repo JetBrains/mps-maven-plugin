@@ -3,14 +3,19 @@ package org.jetbrains.mps.maven.driver;
 import jetbrains.mps.extapi.persistence.FileBasedModelRoot;
 import jetbrains.mps.persistence.DefaultModelRoot;
 import jetbrains.mps.project.ModuleId;
+import jetbrains.mps.project.persistence.ModuleDescriptorPersistence;
+import jetbrains.mps.project.persistence.SolutionDescriptorPersistence;
 import jetbrains.mps.project.structure.model.ModelRootDescriptor;
 import jetbrains.mps.project.structure.modules.SolutionDescriptor;
+import jetbrains.mps.util.JDOMUtil;
 import jetbrains.mps.util.MacroHelper;
 import jetbrains.mps.vfs.impl.IoFile;
+import org.jdom.Document;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 
 class TemporarySolutionIO {
@@ -35,19 +40,15 @@ class TemporarySolutionIO {
         return descriptor;
     }
 
-    static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) {
-        jetbrains.mps.project.persistence.SolutionDescriptorPersistence.saveSolutionDescriptor(
-                new IoFile(solutionFile.toAbsolutePath().toString()),
-                toSolutionDescriptor(temporarySolution), new MacroHelper() {
-                    @Override
-                    public String expandPath(@Nullable String path) {
-                        return path;
-                    }
+    static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) throws IOException {
+        SolutionDescriptor descriptor = toSolutionDescriptor(temporarySolution);
+        org.jdom.Element save = new SolutionDescriptorPersistence(new MacroHelper.MacroNoHelper()).save(
+                descriptor);
+        IoFile ioFile = new IoFile(solutionFile.toAbsolutePath().toString());
+        try (OutputStream os = ioFile.openOutputStream()){
+            JDOMUtil.writeDocument(new Document(save), os);
+        }
 
-                    @Override
-                    public String shrinkPath(@Nullable String absolutePath) {
-                        return absolutePath;
-                    }
-                });
+        ModuleDescriptorPersistence.setTimestamp(descriptor, ioFile);
     }
 }
