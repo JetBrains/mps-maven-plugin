@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 class Mps {
-    private static final String[] DEFAULT_JVM_ARGS = new String[]{"-Xss1024k", "-Xmx512m", "-XX:MaxPermSize=92m", "-XX:+HeapDumpOnOutOfMemoryError"};
+    private static final String[] DEFAULT_JVM_ARGS = new String[]{"-Xss1024k", "-Xmx1024m", "-XX:MaxPermSize=92m", "-XX:+HeapDumpOnOutOfMemoryError"};
 
     static void launchMps(GeneratorStartupInfo generatorStartupInfo, GeneratorInput input, Log mavenLog) throws MojoExecutionException, MojoFailureException {
         CommandLine commandLine = getCommandLine(generatorStartupInfo, input);
