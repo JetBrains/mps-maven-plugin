@@ -9,7 +9,7 @@
         <groupId>org.jetbrains.mps</groupId>
         <artifactId>mps-maven-plugin-parent</artifactId>
         <relativePath>../../</relativePath>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <build>

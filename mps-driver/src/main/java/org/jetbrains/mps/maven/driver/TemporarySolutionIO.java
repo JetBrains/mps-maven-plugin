@@ -1,6 +1,5 @@
 package org.jetbrains.mps.maven.driver;
 
-import jetbrains.mps.extapi.persistence.FileBasedModelRoot;
 import jetbrains.mps.persistence.DefaultModelRoot;
 import jetbrains.mps.project.ModuleId;
 import jetbrains.mps.project.io.DescriptorIO;
@@ -9,8 +8,10 @@ import jetbrains.mps.project.io.DescriptorIOFacade;
 import jetbrains.mps.project.structure.model.ModelRootDescriptor;
 import jetbrains.mps.project.structure.modules.SolutionDescriptor;
 import jetbrains.mps.util.MacroHelper;
+import jetbrains.mps.vfs.FileSystem;
 import jetbrains.mps.vfs.IFile;
 import jetbrains.mps.vfs.impl.IoFile;
+import jetbrains.mps.vfs.impl.IoFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.mps.openapi.module.SModule;
@@ -21,13 +22,11 @@ import java.nio.file.Path;
 class TemporarySolutionIO {
     @NotNull
     private static ModelRootDescriptor newModelRootDescriptor(File modelsDirectory) {
-        DefaultModelRoot modelRoot = new DefaultModelRoot();
-        modelRoot.setContentRoot(modelsDirectory.getAbsolutePath());
-        modelRoot.addFile(FileBasedModelRoot.SOURCE_ROOTS, modelsDirectory.getAbsolutePath());
-
-        ModelRootDescriptor result = new ModelRootDescriptor();
-        modelRoot.save(result.getMemento());
-        return result;
+        FileSystem fs = IoFileSystem.INSTANCE;
+        return DefaultModelRoot.createDescriptor(
+                fs.getFile(modelsDirectory.getAbsolutePath()),
+                fs.getFile(modelsDirectory.getAbsolutePath())
+        );
     }
 
     private static SolutionDescriptor toSolutionDescriptor(TemporarySolution solution) {
