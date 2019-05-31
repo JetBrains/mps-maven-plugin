@@ -99,7 +99,7 @@
     <distributionManagement>
         <site>
             <id>github</id>
-            <url>http://jetbrains.github.io/mps-maven-plugin/</url>
+            <url>https://jetbrains.github.io/mps-maven-plugin/</url>
         </site>
     </distributionManagement>
 
