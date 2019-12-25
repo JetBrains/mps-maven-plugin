@@ -1,7 +1,6 @@
 package org.jetbrains.mps.maven.driver;
 
 import jetbrains.mps.project.io.DescriptorIOException;
-import jetbrains.mps.tool.builder.MpsWorker;
 import jetbrains.mps.tool.builder.make.GeneratorWorker;
 import jetbrains.mps.tool.common.JavaCompilerProperties;
 import jetbrains.mps.tool.common.Script;
@@ -13,8 +12,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 /**
- * Entry point for executing code in the context of MPS classloaders. Called by
- * {@link jetbrains.mps.tool.builder.AntBootstrap} which is executed by {@code org.jetbrains.mps.mavenplugin.mps.Mps2}.
+ * Entry point for executing code in the context of MPS classloaders.
+ * Main class executed by {@code org.jetbrains.mps.mavenplugin.Mps}.
  */
 public class Driver {
     public static void main(String[] args) {
@@ -48,7 +47,7 @@ public class Driver {
 
         Script script = toScript(solutionFile, input);
 
-        GeneratorWorker worker = new GeneratorWorker(script, new MpsWorker.SystemOutLogger());
+        GeneratorWorker worker = new GeneratorWorker(script);
 
         // workFromMain calls System.exit() with appropriate exit code.
         worker.workFromMain();
