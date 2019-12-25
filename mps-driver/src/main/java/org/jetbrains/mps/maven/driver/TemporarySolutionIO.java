@@ -8,9 +8,10 @@ import jetbrains.mps.project.io.DescriptorIOFacade;
 import jetbrains.mps.project.structure.model.ModelRootDescriptor;
 import jetbrains.mps.project.structure.modules.SolutionDescriptor;
 import jetbrains.mps.util.MacroHelper;
-import jetbrains.mps.vfs.FileSystem;
-import jetbrains.mps.vfs.IFile;
+import jetbrains.mps.vfs.*;
 import jetbrains.mps.vfs.impl.IoFileSystem;
+import jetbrains.mps.vfs.iofs.file.LocalIoFileSystem;
+import jetbrains.mps.vfs.iofs.jar.JarIoFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.mps.openapi.module.SModule;
@@ -21,7 +22,7 @@ import java.nio.file.Path;
 class TemporarySolutionIO {
     @NotNull
     private static ModelRootDescriptor newModelRootDescriptor(File modelsDirectory) {
-        FileSystem fs = IoFileSystem.INSTANCE;
+        IFileSystem fs = getFS();
         return DefaultModelRoot.createDescriptor(
                 fs.getFile(modelsDirectory.getAbsolutePath()),
                 fs.getFile(modelsDirectory.getAbsolutePath())
@@ -39,7 +40,7 @@ class TemporarySolutionIO {
     }
 
     static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) throws DescriptorIOException {
-        FileSystem fs = IoFileSystem.INSTANCE;
+        IFileSystem fs = getFS();
         DescriptorIO<SolutionDescriptor> io =
                 new DescriptorIOFacade(macroHelpers()).standardProvider().solutionDescriptorIO();
         io.writeToFile(
@@ -89,4 +90,22 @@ class TemporarySolutionIO {
             return absolutePath;
         }
     }
+
+    // FIXME find a proper way to init fs
+    private static IFileSystem getFS() {
+        if (fs == null) {
+            VFSManager mgr = new VFSManager();
+            fs = new LocalIoFileSystem(mgr);
+            IFileSystem jarFs = new JarIoFileSystem(mgr);
+            mgr.registerFS(VFSManager.JAVA_IO_FILE_FS, fs);
+            mgr.registerFS(VFSManager.JAVA_IO_JAR_FS, jarFs);
+            // Files.fromURL() depends on the following
+            IoFileSystem.newInstance(mgr);
+            FileSystem obsoleteFs = IoFileSystem.INSTANCE;
+            FileSystemExtPoint.setFS(obsoleteFs);
+        }
+        return fs;
+    }
+
+    private static IFileSystem fs;
 }
