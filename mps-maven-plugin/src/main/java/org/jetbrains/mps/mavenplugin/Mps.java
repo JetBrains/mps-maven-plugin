@@ -65,7 +65,6 @@ class Mps {
         }
         commandLine.addArgument("-classpath");
         commandLine.addArgument(sb.toString());
-        commandLine.addArgument("jetbrains.mps.tool.builder.AntBootstrap");
         commandLine.addArgument(generatorStartupInfo.driverClassName);
 
         Path inputFile;
