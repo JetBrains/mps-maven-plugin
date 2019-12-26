@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jetbrains.mps</groupId>
     <artifactId>mps-maven-plugin-parent</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
     <name>MPS Maven Plugin - Parent</name>
     <packaging>pom</packaging>
     <url>https://github.com/JetBrains/mps-maven-plugin</url>

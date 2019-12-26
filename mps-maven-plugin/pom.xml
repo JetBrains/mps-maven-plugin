@@ -13,7 +13,7 @@
         <groupId>org.jetbrains.mps</groupId>
         <artifactId>mps-maven-plugin-parent</artifactId>
         <relativePath>../</relativePath>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.4-SNAPSHOT</version>
     </parent>
 
     <dependencies>
