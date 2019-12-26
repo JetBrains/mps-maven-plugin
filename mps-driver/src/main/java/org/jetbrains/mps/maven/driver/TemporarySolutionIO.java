@@ -10,7 +10,6 @@ import jetbrains.mps.project.structure.modules.SolutionDescriptor;
 import jetbrains.mps.util.MacroHelper;
 import jetbrains.mps.vfs.FileSystem;
 import jetbrains.mps.vfs.IFile;
-import jetbrains.mps.vfs.impl.IoFile;
 import jetbrains.mps.vfs.impl.IoFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,11 +39,12 @@ class TemporarySolutionIO {
     }
 
     static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) throws DescriptorIOException {
+        FileSystem fs = IoFileSystem.INSTANCE;
         DescriptorIO<SolutionDescriptor> io =
                 new DescriptorIOFacade(macroHelpers()).standardProvider().solutionDescriptorIO();
         io.writeToFile(
                 toSolutionDescriptor(temporarySolution),
-                new IoFile(solutionFile.toAbsolutePath().toString())
+                fs.getFile(solutionFile.toAbsolutePath().toString())
         );
     }
 
