@@ -70,7 +70,8 @@ class Mps {
         Path inputFile;
         try {
             inputFile = Files.createTempFile("mpsinput", ".bin");
-            inputFile.toFile().deleteOnExit();
+            System.out.println("temp file: " + inputFile);
+//            inputFile.toFile().deleteOnExit();
             try (OutputStream stream = Files.newOutputStream(inputFile);
                  ObjectOutputStream oos = new ObjectOutputStream(stream)) {
                 oos.writeObject(input);

@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Entry point for executing code in the context of MPS classloaders.
@@ -65,6 +66,7 @@ public class Driver {
         new JavaCompilerProperties(script).setSkipCompilation(true);
 
         addLibraryJarsToScript(script, generatorInput.libraryJars);
+        addJavaStubSolutionsToScript(script, generatorInput.javaClassJars);
 
         script.addChunk(Collections.singletonList(solutionFile.toAbsolutePath().toString()), false);
         return script;
@@ -73,6 +75,30 @@ public class Driver {
     private static void addLibraryJarsToScript(Script script, Iterable<File> libraryJars) {
         for (File file : libraryJars) {
             script.addLibraryJar(file.getAbsolutePath());
+        }
+    }
+
+    private static void addJavaStubSolutionsToScript(Script script, Map<String, File> jars) {
+        try {
+
+            for (Map.Entry<String, File> entry : jars.entrySet()) {
+                String libraryName = entry.getKey();
+                File jarFile = entry.getValue();
+
+                System.out.println("java classes jar: " + jarFile + "; module name: " + libraryName);
+
+                Path stubSolutionDescriptorFile = Files.createTempFile("mpsmavenstub", ".msd");
+
+                TemporarySolutionIO.createStubSolution(stubSolutionDescriptorFile, libraryName, jarFile);
+
+                // name doesn't count
+                script.addLibrary(libraryName, stubSolutionDescriptorFile.toFile());
+            }
+        } catch (IOException | DescriptorIOException e) {
+            System.err.println("Error creating temporary file");
+            e.printStackTrace();
+            System.exit(1);
+            throw new AssertionError(e);
         }
     }
 }

@@ -3,7 +3,8 @@ package org.jetbrains.mps.maven.driver;
 import java.io.File;
 import java.io.Serializable;
 
-class TemporarySolution implements Serializable {
+class
+TemporarySolution implements Serializable {
     final File modelsDirectory;
     final File outputDirectory;
 
