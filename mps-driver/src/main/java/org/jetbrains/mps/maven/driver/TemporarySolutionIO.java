@@ -18,6 +18,7 @@ import org.jetbrains.mps.openapi.module.SModule;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 
 class TemporarySolutionIO {
     @NotNull
@@ -39,6 +40,15 @@ class TemporarySolutionIO {
         return descriptor;
     }
 
+    private static SolutionDescriptor toStubSolutionDescriptor(String namespace, File jarFile) {
+        SolutionDescriptor descriptor = new SolutionDescriptor();
+        descriptor.getModelRootDescriptors().add(ModelRootDescriptor.addJavaStubModelRoot(jarFile, Collections.emptyList()));
+        descriptor.setNamespace(namespace);
+        descriptor.setId(ModuleId.foreign(namespace));
+        descriptor.setCompileInMPS(false);
+        return descriptor;
+    }
+
     static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) throws DescriptorIOException {
         IFileSystem fs = getFS();
         DescriptorIO<SolutionDescriptor> io =
@@ -47,6 +57,17 @@ class TemporarySolutionIO {
                 toSolutionDescriptor(temporarySolution),
                 fs.getFile(solutionFile.toAbsolutePath().toString())
         );
+    }
+
+    static void createStubSolution(File descriptorFile, String moduleName, File jarFile) throws DescriptorIOException {
+        IFileSystem fs = getFS();
+
+        IFile f = fs.getFile(descriptorFile);
+        SolutionDescriptor d = toStubSolutionDescriptor(moduleName, jarFile);
+
+        DescriptorIO<SolutionDescriptor> io =
+                new DescriptorIOFacade(macroHelpers()).standardProvider().solutionDescriptorIO();
+        io.writeToFile(d, f);
     }
 
     private static MacroHelper.Source macroHelpers() {

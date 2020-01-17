@@ -67,6 +67,9 @@ public class GenerateJavaMojo extends AbstractMojo {
     @Parameter
     private Dependency[] dependencies = new Dependency[0];
 
+    @Parameter
+    private Dependency[] javaDependencies = new Dependency[0];
+
     @Component
     private RepositorySystem repoSystem;
 
@@ -75,9 +78,13 @@ public class GenerateJavaMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         mavenProject.addCompileSourceRoot(outputDirectory.getPath());
+
         Map<ArtifactCoordinates, File> resolvedDependencies;
+        Map<ArtifactCoordinates, File> resolvedClassStubsDependencies;
+
         try {
             resolvedDependencies = resolveDependencies(ObjectArrays.concat(mps, dependencies));
+            resolvedClassStubsDependencies = resolveDependencies(javaDependencies);
         } catch (DependencyResolutionException e) {
             throw new MojoExecutionException("Error resolving dependencies", e);
         }
@@ -108,14 +115,19 @@ public class GenerateJavaMojo extends AbstractMojo {
                     "org.jetbrains.mps.maven.driver.Driver",
                     driverClassPath);
 
-            Mps.launchMps(startupInfo, new GeneratorInput(mavenProject.getBasedir(),
-                            modelsDirectory, outputDirectory, getJars(extractedDependencies.values())),
+            Mps.launchMps(
+                    startupInfo,
+                    new GeneratorInput(mavenProject.getBasedir(),
+                            modelsDirectory,
+                            outputDirectory,
+                            getJars(extractedDependencies.values()),
+                            nameDependencies(resolvedClassStubsDependencies)),
                     getLog());
         } catch (Exception e) {
             Throwables.propagateIfPossible(e, MojoExecutionException.class, MojoFailureException.class);
             throw new MojoExecutionException("Unexpected exception", e);
         } finally {
-            tryDeletingDirectory(temporaryWorkingDirectory);
+             tryDeletingDirectory(temporaryWorkingDirectory);
         }
     }
 
@@ -138,7 +150,7 @@ public class GenerateJavaMojo extends AbstractMojo {
             if (root.isFile()) {
                 jars.add(root);
             } else if (root.isDirectory()) {
-                jars.addAll(FileUtils.listFiles(root, new String[] { "jar" }, true));
+                jars.addAll(FileUtils.listFiles(root, new String[]{"jar"}, true));
             }
         }
 
@@ -154,6 +166,19 @@ public class GenerateJavaMojo extends AbstractMojo {
             File extractedRoot;
             extractedRoot = extractDependency(temporaryWorkingDirectory, extractor, entry.getKey(), entry.getValue());
             result.put(entry.getKey(), extractedRoot);
+        }
+
+        return result;
+    }
+
+    /**
+     * Replace artifact coordinates with artifact name, same as Intellij Idea gives to maven library.
+     */
+    private Map<String, File> nameDependencies(Map<ArtifactCoordinates, File> resolvedDependencies) {
+        Map<String, File> result = new HashMap<>(resolvedDependencies.size());
+
+        for (Map.Entry<ArtifactCoordinates, File> entry : resolvedDependencies.entrySet()) {
+            result.put(libraryNameFor(entry.getKey()), entry.getValue());
         }
 
         return result;
@@ -224,6 +249,14 @@ public class GenerateJavaMojo extends AbstractMojo {
         return new org.eclipse.aether.graph.Dependency(
                 new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(),
                         dependency.getType(), dependency.getVersion()), dependency.getScope());
+    }
+
+    /**
+     * Name of Intellij Idea library for the artifact
+     */
+    private String libraryNameFor(ArtifactCoordinates artifact) {
+        // TODO check if idea's code can be reused here, to avoid discrepancy
+        return "Maven: " + artifact.groupId + ":" + artifact.artifactId + ":" + artifact.version;
     }
 
     private void tryDeletingDirectory(File directory) {
