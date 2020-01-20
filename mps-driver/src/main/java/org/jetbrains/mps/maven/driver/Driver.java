@@ -38,6 +38,7 @@ public class Driver {
         Path solutionFile;
         try {
             solutionFile = Files.createTempFile("mpsmaven", ".msd");
+            solutionFile.toFile().deleteOnExit();
             TemporarySolutionIO.writeToFile(solution, solutionFile);
         } catch (IOException | DescriptorIOException e) {
             System.err.println("Error creating temporary file");
@@ -85,7 +86,7 @@ public class Driver {
                 File jarFile = entry.getValue();
 
                 File stubSolutionDescriptorFile = Files.createTempFile("mpsmavenstub", ".msd").toFile();
-//                stubSolutionDescriptorFile.deleteOnExit();
+                stubSolutionDescriptorFile.deleteOnExit();
 
                 TemporarySolutionIO.createStubSolution(stubSolutionDescriptorFile, libraryName, jarFile);
                 script.addLibrary(libraryName, stubSolutionDescriptorFile);
