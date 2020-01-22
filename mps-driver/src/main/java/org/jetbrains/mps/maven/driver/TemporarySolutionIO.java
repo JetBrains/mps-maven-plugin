@@ -37,6 +37,11 @@ class TemporarySolutionIO {
         descriptor.setNamespace("mpsmaventemp");
         descriptor.setId(ModuleId.foreign("mpsmaventemp"));
         descriptor.setCompileInMPS(false);
+
+        for (File sr: solution.javaSourceDirs) {
+            System.out.println("source root: " + sr.getAbsolutePath());
+        }
+
         return descriptor;
     }
 

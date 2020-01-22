@@ -34,7 +34,7 @@ public class Driver {
             throw new AssertionError(e);
         }
 
-        TemporarySolution solution = new TemporarySolution(input.modelsDirectory, input.outputDirectory);
+        TemporarySolution solution = new TemporarySolution(input.workingDirectory, input.modelsDirectory, input.sourceRootDirectories, input.outputDirectory);
         Path solutionFile;
         try {
             solutionFile = Files.createTempFile("mpsmaven", ".msd");

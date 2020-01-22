@@ -8,6 +8,7 @@ import java.util.Map;
 public class GeneratorInput implements Serializable {
     public final File workingDirectory;
     public final File modelsDirectory;
+    public final Collection<String> sourceRootDirectories;
     public final File outputDirectory;
     public final Collection<File> libraryJars;
     public final Map<String, File> classStubsJars;
@@ -15,11 +16,13 @@ public class GeneratorInput implements Serializable {
     public GeneratorInput(
             File workingDirectory,
             File modelsDirectory,
+            Collection<String> sourceRootDirectories,
             File outputDirectory,
             Collection<File> libraryJars,
             Map<String, File> classStubsJars) {
         this.workingDirectory = workingDirectory;
         this.modelsDirectory = modelsDirectory;
+        this.sourceRootDirectories = sourceRootDirectories;
         this.outputDirectory = outputDirectory;
         this.libraryJars = libraryJars;
         this.classStubsJars = classStubsJars;

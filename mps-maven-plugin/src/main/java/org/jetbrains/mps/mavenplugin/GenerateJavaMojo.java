@@ -114,6 +114,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                     startupInfo,
                     new GeneratorInput(mavenProject.getBasedir(),
                             modelsDirectory,
+                            mavenProject.getCompileSourceRoots(),
                             outputDirectory,
                             getJars(extractedDependencies.values()),
                             nameDependencies(mavenProject.getDependencyArtifacts())),
