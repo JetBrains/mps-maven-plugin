@@ -67,9 +67,6 @@ public class GenerateJavaMojo extends AbstractMojo {
     @Parameter
     private Dependency[] dependencies = new Dependency[0];
 
-    @Parameter
-    private Dependency[] javaDependencies = new Dependency[0];
-
     @Component
     private RepositorySystem repoSystem;
 
@@ -80,11 +77,9 @@ public class GenerateJavaMojo extends AbstractMojo {
         mavenProject.addCompileSourceRoot(outputDirectory.getPath());
 
         Map<ArtifactCoordinates, File> resolvedDependencies;
-        Map<ArtifactCoordinates, File> resolvedClassStubsDependencies;
 
         try {
             resolvedDependencies = resolveDependencies(ObjectArrays.concat(mps, dependencies));
-            resolvedClassStubsDependencies = resolveDependencies(javaDependencies);
         } catch (DependencyResolutionException e) {
             throw new MojoExecutionException("Error resolving dependencies", e);
         }
@@ -121,7 +116,7 @@ public class GenerateJavaMojo extends AbstractMojo {
                             modelsDirectory,
                             outputDirectory,
                             getJars(extractedDependencies.values()),
-                            nameDependencies(resolvedClassStubsDependencies)),
+                            nameDependencies(mavenProject.getDependencyArtifacts())),
                     getLog());
         } catch (Exception e) {
             Throwables.propagateIfPossible(e, MojoExecutionException.class, MojoFailureException.class);
@@ -174,11 +169,11 @@ public class GenerateJavaMojo extends AbstractMojo {
     /**
      * Replace artifact coordinates with artifact name, same as Intellij Idea gives to maven library.
      */
-    private Map<String, File> nameDependencies(Map<ArtifactCoordinates, File> resolvedDependencies) {
-        Map<String, File> result = new HashMap<>(resolvedDependencies.size());
+    private Map<String, File> nameDependencies(Set<org.apache.maven.artifact.Artifact> artifacts) {
+        Map<String, File> result = new HashMap<>(artifacts.size());
 
-        for (Map.Entry<ArtifactCoordinates, File> entry : resolvedDependencies.entrySet()) {
-            result.put(libraryNameFor(entry.getKey()), entry.getValue());
+        for (org.apache.maven.artifact.Artifact artifact : artifacts) {
+            result.put(libraryNameFor(artifact), artifact.getFile());
         }
 
         return result;
@@ -254,9 +249,9 @@ public class GenerateJavaMojo extends AbstractMojo {
     /**
      * Name of Intellij Idea library for the artifact
      */
-    private String libraryNameFor(ArtifactCoordinates artifact) {
+    private String libraryNameFor(org.apache.maven.artifact.Artifact artifact) {
         // TODO check if idea's code can be reused here, to avoid discrepancy
-        return "Maven: " + artifact.groupId + ":" + artifact.artifactId + ":" + artifact.version;
+        return "Maven: " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
     private void tryDeletingDirectory(File directory) {
