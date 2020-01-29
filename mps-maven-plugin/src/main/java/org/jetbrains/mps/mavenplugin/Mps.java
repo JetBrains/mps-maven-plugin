@@ -91,6 +91,7 @@ class Mps {
     private static Collection<File> calculateMpsClassPath(File mpsHome) throws MojoFailureException {
         Collection<File> result = new LinkedHashSet<>();
         gatherAllJarsUnder(new File(mpsHome, "lib"), result);
+        gatherAllJarsUnder(new File(mpsHome, "plugins/mps-java/lib"), result);
         return result;
     }
 

@@ -1,6 +1,7 @@
 package org.jetbrains.mps.maven.driver;
 
 import jetbrains.mps.persistence.DefaultModelRoot;
+import jetbrains.mps.persistence.MementoImpl;
 import jetbrains.mps.project.ModuleId;
 import jetbrains.mps.project.io.DescriptorIO;
 import jetbrains.mps.project.io.DescriptorIOException;
@@ -15,9 +16,11 @@ import jetbrains.mps.vfs.iofs.jar.JarIoFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.mps.openapi.module.SModule;
+import org.jetbrains.mps.openapi.persistence.Memento;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 
 class TemporarySolutionIO {
@@ -32,11 +35,18 @@ class TemporarySolutionIO {
 
     private static SolutionDescriptor toSolutionDescriptor(TemporarySolution solution) {
         SolutionDescriptor descriptor = new SolutionDescriptor();
-        descriptor.getModelRootDescriptors().add(newModelRootDescriptor(solution.modelsDirectory));
+
+        Collection<ModelRootDescriptor> modelRoots = descriptor.getModelRootDescriptors();
+        modelRoots.add(newModelRootDescriptor(solution.modelsDirectory));
+        for (File javaSourceDir : solution.javaSourceDirs) {
+            modelRoots.add(javaSourceStubMRDescriptor(javaSourceDir));
+        }
+
         descriptor.setOutputPath(solution.outputDirectory.getAbsolutePath());
-        descriptor.setNamespace("mpsmaventemp");
-        descriptor.setId(ModuleId.foreign("mpsmaventemp"));
+        descriptor.setNamespace(solution.moduleName);
+        descriptor.setId(ModuleId.foreign(solution.moduleName));
         descriptor.setCompileInMPS(false);
+
         return descriptor;
     }
 
@@ -47,6 +57,13 @@ class TemporarySolutionIO {
         descriptor.setId(ModuleId.foreign(namespace));
         descriptor.setCompileInMPS(false);
         return descriptor;
+    }
+
+    // FIXME depends on inner workings of JavaSourceModelRoot
+    private static ModelRootDescriptor javaSourceStubMRDescriptor(File file) {
+        Memento m = new MementoImpl();
+        m.put(PATH_KEY, file.getAbsolutePath());
+        return new ModelRootDescriptor(JAVA_SOURCE_STUBS_TYPE, m);
     }
 
     static void writeToFile(TemporarySolution temporarySolution, Path solutionFile) throws DescriptorIOException {
@@ -129,4 +146,7 @@ class TemporarySolutionIO {
     }
 
     private static IFileSystem fs;
+
+    private static final String PATH_KEY = "path";
+    public static final String JAVA_SOURCE_STUBS_TYPE = "java_source_stubs";
 }

@@ -5,6 +5,8 @@ import jetbrains.mps.tool.builder.make.GeneratorWorker;
 import jetbrains.mps.tool.common.JavaCompilerProperties;
 import jetbrains.mps.tool.common.Script;
 import org.apache.log4j.Level;
+import org.jetbrains.mps.openapi.persistence.ModelRootFactory;
+import org.jetbrains.mps.openapi.persistence.PersistenceFacade;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -34,7 +36,7 @@ public class Driver {
             throw new AssertionError(e);
         }
 
-        TemporarySolution solution = new TemporarySolution(input.modelsDirectory, input.outputDirectory);
+        TemporarySolution solution = new TemporarySolution(input.moduleName, input.modelsDirectory, input.sourceRootDirectories, input.outputDirectory);
         Path solutionFile;
         try {
             solutionFile = Files.createTempFile("mpsmaven", ".msd");
@@ -49,7 +51,26 @@ public class Driver {
 
         Script script = toScript(solutionFile, input);
 
-        GeneratorWorker worker = new GeneratorWorker(script);
+        // TODO introduce proper support for mps core plugins
+        GeneratorWorker worker = new GeneratorWorker(script) {
+            @Override
+            public void work() {
+
+                try {
+                    Class<?> modelRootFactoryClass = Class.forName("jetbrains.mps.java.core.sourceStubs.JavaSourceStubModelRootFactory");
+                    PersistenceFacade.getInstance().setModelRootFactory(
+                            TemporarySolutionIO.JAVA_SOURCE_STUBS_TYPE,
+                            (ModelRootFactory) modelRootFactoryClass.newInstance()
+                    );
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Java source persistence class not found");
+                } catch (InstantiationException | IllegalAccessException e) {
+                    System.out.println("Could not instantiate java source stubs persistence support");
+                }
+
+                super.work();
+            }
+        };
 
         // workFromMain calls System.exit() with appropriate exit code.
         worker.workFromMain();

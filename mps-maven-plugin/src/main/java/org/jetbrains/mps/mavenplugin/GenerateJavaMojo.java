@@ -74,6 +74,7 @@ public class GenerateJavaMojo extends AbstractMojo {
     private RepositorySystemSession repoSession;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        List<String> compileSourceRoots = new ArrayList<>(mavenProject.getCompileSourceRoots());
         mavenProject.addCompileSourceRoot(outputDirectory.getPath());
 
         Map<ArtifactCoordinates, File> resolvedDependencies;
@@ -112,8 +113,11 @@ public class GenerateJavaMojo extends AbstractMojo {
 
             Mps.launchMps(
                     startupInfo,
-                    new GeneratorInput(mavenProject.getBasedir(),
+                    new GeneratorInput(
+                            mavenProject.getBasedir(),
+                            mavenProject.getArtifactId(),
                             modelsDirectory,
+                            compileSourceRoots,
                             outputDirectory,
                             getJars(extractedDependencies.values()),
                             nameDependencies(mavenProject.getDependencyArtifacts())),
